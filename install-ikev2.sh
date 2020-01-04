@@ -1,12 +1,3 @@
-#!/bin/sh
-#
-# Script for automatic setup of an IPsec VPN server on Ubuntu LTS and Debian.
-# Works on any dedicated server or virtual private server (VPS) except OpenVZ.
-#
-# DO NOT RUN THIS SCRIPT ON YOUR PC OR MAC!
-# Script is written by WHMCS-Smarters ( https://www.whmcssmarters.com) 
-# We provide the VPN Solution & Services for Business 
-
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 SYS_DT=$(date +%F-%T)
 
@@ -137,10 +128,9 @@ ipsec restart
 
 bigecho "Installion Done" 
 
+ca_cert = $(cat /etc/ipsec.d/cacerts/ca-cert.pem)
 echo " Username :  test"
 echo " Password : test123"
 echo " Certificate is " 
-ca_cert=$(cat /etc/ipsec.d/cacerts/ca-cert.pem)
+
 echo $ca_cert;
-
-
