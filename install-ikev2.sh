@@ -112,6 +112,8 @@ conn ikev2-vpn
     rightdns=8.8.8.8,8.8.4.4
     rightsendcert=never
     eap_identity=%identity
+    ike=aes256-sha1-modp1024,aes256gcm16-sha256-ecp521,aes256-sha256-ecp384,aes256-aes128-sha1-modp1024-3des!
+    esp=aes256-sha1,aes128-sha256-modp3072,aes256gcm16-sha256,aes256gcm16-ecp384,aes256-sha256-sha1-3des!
 EOF
 
 if [[ -e /etc/ipsec.secrets ]]; then
