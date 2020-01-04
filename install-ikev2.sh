@@ -128,9 +128,10 @@ ipsec restart
 
 bigecho "Installion Done" 
 
-ca_cert = $(cat /etc/ipsec.d/cacerts/ca-cert.pem)
 echo " Username :  test"
 echo " Password : test123"
 echo " Certificate is " 
-
+ca_cert=$(cat /etc/ipsec.d/cacerts/ca-cert.pem)
 echo $ca_cert;
+
+
