@@ -1,3 +1,5 @@
+#!/bin/sh
+
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 SYS_DT=$(date +%F-%T)
 
@@ -128,7 +130,7 @@ ipsec restart
 
 bigecho "Installion Done" 
 
-ca_cert = $(cat /etc/ipsec.d/cacerts/ca-cert.pem)
+ca_cert=$(cat /etc/ipsec.d/cacerts/ca-cert.pem)
 echo " Username :  test"
 echo " Password : test123"
 echo " Certificate is " 
