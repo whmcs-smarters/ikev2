@@ -1,4 +1,5 @@
 #!/bin/sh
+# Created by WHMCS-Smarters www.whmcssmarters.com
 
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 SYS_DT=$(date +%F-%T)
