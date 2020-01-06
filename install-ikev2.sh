@@ -136,8 +136,61 @@ test : EAP "test123"
 
 EOF
 
-# Restarting Ipsec 
 
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
+
+sudo apt-get -yq install iptables-persistent
+
+iptables -P INPUT   ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT  ACCEPT
+ 
+iptables -F
+iptables -t nat -F
+iptables -t mangle -F
+ 
+ 
+iptables -A INPUT -p udp --dport  500 -j ACCEPT
+iptables -A INPUT -p udp --dport 4500 -j ACCEPT
+ 
+# forward VPN traffic anywhere
+iptables -A FORWARD --match policy --pol ipsec --dir in  --proto esp -s 10.10.10.0/24 -j ACCEPT
+iptables -A FORWARD --match policy --pol ipsec --dir out --proto esp -d 10.10.10.0/24 -j ACCEPT
+ 
+iptables -P FORWARD ACCEPT
+ 
+# reduce MTU/MSS values for dumb VPN clients
+iptables -t mangle -A FORWARD --match policy --pol ipsec --dir in -s 10.10.10.0/24 -o eth0 -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1536 -j TCPMSS --set-mss 1360
+ 
+# masquerade VPN traffic over eth0 etc.
+iptables -t nat -A POSTROUTING -s 10.10.10.0/24 -o eth0 -m policy --pol ipsec --dir out -j ACCEPT  # exempt IPsec traffic from masquerading
+iptables -t nat -A POSTROUTING -s 10.10.10.0/24 -o eth0 -j MASQUERADE
+
+# Saving Iptables rules
+iptables-save > /etc/iptables/rules.v4
+
+
+bigecho "Updating sysctl settings..."
+
+if ! grep -qs "smarters VPN script" /etc/sysctl.conf; then
+  conf_bk "/etc/sysctl.conf"
+
+
+cat >> /etc/sysctl.conf <<EOF
+
+# Added by smarters VPN script
+
+net.ipv4.ip_forward = 1
+net.ipv4.ip_no_pmtu_disc = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv6.conf.all.disable_ipv6 = 1
+EOF
+fi
+
+sysctl -p
 ipsec restart
 
 bigecho "Installion Done" 
