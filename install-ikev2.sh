@@ -12,11 +12,16 @@ bigecho() { echo; echo "## $1"; echo; }
 PUBLIC_IP=$(dig @resolver1.opendns.com -t A -4 myip.opendns.com +short)
 [ -z "$PUBLIC_IP" ] && PUBLIC_IP=$(wget -t 3 -T 15 -qO- http://ipv4.icanhazip.com)
 
-echo " Public IP Address: " printf '%s\n' "$PUBLIC_IP"
+echo " Public IP Address: $PUBLIC_IP"
+
+bigecho "Populating apt-get cache..."
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get -yq update || exiterr "'apt-get update' failed."
 
 bigecho "VPN setup in progress... Please be patient."
 
-sudo apt update -y
+
  
 sudo apt install strongswan strongswan-pki -yq || exiterr2
 
@@ -47,7 +52,11 @@ else
     echo "Message: Directory ~/pki/ does not exists,So creating..."
 fi
 
-mkdir -p ~/pki/{cacerts,certs,private} || exiterr " Directories not created "
+
+mkdir -p ~/pki/ || exiterr " Directories not created "
+mkdir -p ~/pki/cacerts/
+mkdir -p ~/pki/certs/
+mkdir -p ~/pki/private/
 
 chmod 700 ~/pki
 
@@ -70,8 +79,8 @@ cp -r ~/pki/* /etc/ipsec.d/
 
 bigecho "Installing packages required for setup..."
 
-apt-get -yq install wget dnsutils openssl \
-  iptables iproute2 gawk grep sed net-tools || exiterr2
+#apt-get -yq install wget dnsutils openssl \
+ # iptables iproute2 gawk grep sed net-tools || exiterr2
 
 
 # Create IPsec config
@@ -81,7 +90,7 @@ if [[ -e /etc/ipsec.conf ]]; then
 
 rm /etc/ipsec.conf
 
-echo "Remooved ipsec.conf existing file"
+echo "Removed ipsec.conf existing file"
 
 fi
 
